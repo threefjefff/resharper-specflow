@@ -1,4 +1,4 @@
-Language: PsiLanguageType:GHERKIN
+﻿Language: PsiLanguageType:GHERKIN
 GherkinFile: Ruby8793.feature
   GherkinFeature: feature
     GherkinToken(0,7): FEATURE_KEYWORD('Feature')

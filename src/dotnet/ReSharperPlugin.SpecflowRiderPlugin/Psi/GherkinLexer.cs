@@ -81,7 +81,7 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Psi
             }
             else if (_myState == STATE_PARAMETER_INSIDE_PYSTRING)
             {
-                if (c == '>')
+                if (IsClosingBrace(c))
                 {
                     _myState = STATE_INSIDE_PYSTRING;
                     _currentPosition++;
@@ -103,7 +103,7 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Psi
                 }
                 else
                 {
-                    if (Buffer[_currentPosition] == '<')
+                    if (IsOpeningBrace(Buffer[_currentPosition]))
                     {
                         if (IsStepParameter(PYSTRING_MARKER))
                         {
@@ -235,7 +235,7 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Psi
 
                 if (_myState == STATE_PARAMETER_INSIDE_STEP)
                 {
-                    if (c == '>')
+                    if (IsClosingBrace(c))
                     {
                         _myState = STATE_AFTER_KEYWORD_WITH_PARAMETER;
                         _currentPosition++;
@@ -251,7 +251,7 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Psi
                 }
                 else if (_myState == STATE_AFTER_KEYWORD_WITH_PARAMETER)
                 {
-                    if (_currentPosition < _myEndOffset && Buffer[_currentPosition] == '<' && IsStepParameter("\n"))
+                    if (_currentPosition < _myEndOffset && IsOpeningBrace(Buffer[_currentPosition]) && IsStepParameter("\n"))
                     {
                         _myState = STATE_PARAMETER_INSIDE_STEP;
                         _currentPosition++;
@@ -300,7 +300,7 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Psi
         private void AdvanceToParameterEnd(string endSymbol) {
             _currentPosition++;
             int mark = _currentPosition;
-            while (_currentPosition < _myEndOffset && !IsStringAtPosition(endSymbol) && Buffer[_currentPosition] != '>') {
+            while (_currentPosition < _myEndOffset && !IsStringAtPosition(endSymbol) && !IsClosingBrace(Buffer[_currentPosition])) {
                 _currentPosition++;
             }
 
@@ -351,17 +351,19 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Psi
         private bool IsStepParameter(string currentElementTerminator) {
             int pos = _currentPosition;
 
-            if (Buffer[pos] == '<') {
-                while (pos < _myEndOffset && Buffer[pos] != '\n' && Buffer[pos] != '>' && !IsStringAtPosition(currentElementTerminator, pos)) {
+            if (IsOpeningBrace(Buffer[pos])) {
+                while (pos < _myEndOffset && Buffer[pos] != '\n' && !IsClosingBrace(Buffer[pos]) && !IsStringAtPosition(currentElementTerminator, pos)) {
                     pos++;
                 }
 
-                return pos < _myEndOffset && Buffer[pos] == '>';
+                return pos < _myEndOffset && IsClosingBrace(Buffer[pos]);
             }
 
             return false;
         }
 
+        private bool IsOpeningBrace(char x) => x == '<' || x == '"';
+        private bool IsClosingBrace(char x) => x == '>' || x == '"';
 
         public object CurrentPosition { get => _currentPosition; set => _currentPosition = (int)value; }
         
