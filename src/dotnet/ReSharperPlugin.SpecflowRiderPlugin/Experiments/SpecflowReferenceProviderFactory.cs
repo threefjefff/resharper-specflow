@@ -5,6 +5,7 @@ using System.Text;
 using JetBrains.DataFlow;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
 using JetBrains.Rd.Impl;
 using JetBrains.ReSharper.Psi;
@@ -27,31 +28,34 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Experiments
             return null;
         }
 
-        public ISignal<IReferenceProviderFactory> Changed { get; } = new Signal<IReferenceProviderFactory>(Lifetime.Eternal, "test");
+        public ISignal<IReferenceProviderFactory> Changed { get; } = new Signal<IReferenceProviderFactory>(Lifetime.Eternal, nameof(SpecflowReferenceProviderFactory));
     }
 
     public class CSharpToGherkinReferenceFactory : IReferenceFactory
     {
         public static readonly ClrTypeName GivenAttribute =
             new ClrTypeName("TechTalk.SpecFlow.GivenAttribute");
+        public static readonly ClrTypeName WhenAttribute =
+            new ClrTypeName("TechTalk.SpecFlow.WhenAttribute");
+        public static readonly ClrTypeName ThenAttribute =
+            new ClrTypeName("TechTalk.SpecFlow.ThenAttribute");
 
-        
         public ReferenceCollection GetReferences(ITreeNode element, ReferenceCollection oldReferences)
         {
-//            Protocol.TraceLogger.Log(LoggingLevel.INFO, $"GetReferences: {element.GetSourceFile()?.Name}: Node Type: {element.NodeType}");
-            if (element is ILiteralExpression literal && literal.ConstantValue.Value is string)
+            if (element.IsPhysical() 
+                && element.IsValid() 
+                && element is ILiteralExpression literal 
+                && literal.ConstantValue.Value is string)
             {
                 var argumentExpression = literal as ICSharpExpression;
                 var attribute = AttributeNavigator.GetByConstructorArgumentExpression(argumentExpression);
 
-                if (attribute?.Name.Reference.Resolve().DeclaredElement is IClass @class && Equals(@class.GetClrName(), GivenAttribute))
+                if (attribute?.Name.Reference.Resolve().DeclaredElement is IClass @class && IsStepDefinition(@class, out var clrTypeName))
                 {
-//                        attribute.DumpObj(1);
                     var stringRegexLiteral = attribute.ConstructorArgumentExpressions[0] as ILiteralExpression;
                     var stringToken = stringRegexLiteral.Literal as CSharpGenericToken;
-                    var regexString = stringToken.GetText();
-                        
-                    Protocol.Logger.Log(LoggingLevel.INFO, $"Found GIVEN attribute with regex: {regexString}");
+                    var regexString = SimplifyRegexCapgroups(stringToken.GetText());
+                    Protocol.Logger.Log(LoggingLevel.INFO, $"Found step definiton: {clrTypeName.ShortName} {regexString}");
                     return oldReferences;
                 }
             }
@@ -62,6 +66,46 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Experiments
         public bool HasReference(ITreeNode element, IReferenceNameContainer names)
         {
             return false;
+        }
+
+        private bool IsStepDefinition(IClass @class, out IClrTypeName clrTypeName)
+        {
+            clrTypeName = @class.GetClrName();
+            return Equals(clrTypeName, GivenAttribute) 
+                || Equals(clrTypeName, WhenAttribute)
+                || Equals(clrTypeName, ThenAttribute);
+        }
+        
+        private string SimplifyRegexCapgroups(string regex)
+        {
+            return regex.Replace("(.*)", "()");
+            // var firstCapOpen = regex.IndexOf('(');
+            // if (firstCapOpen == -1) return regex;
+            //
+            // var chars = regex.ToCharArray();
+            // var open = 1;
+            // var pointer = firstCapOpen + 1;
+            // int outerOpen = firstCapOpen;
+            //
+            //
+            // while (pointer < chars.Length - 1 && open > 0)
+            // {
+            //     switch (chars[pointer])
+            //     {
+            //         case '(':
+            //             open += 1;
+            //             break;
+            //         case ')':
+            //             open -= 1;
+            //             break;
+            //     }
+            // }
+            //
+            // if (open == 0)
+            // {
+            //     chars = regex.Remove(outerOpen, pointer - outerOpen).ToCharArray();
+            //     pointer += 1;
+            // }
         }
     }
 

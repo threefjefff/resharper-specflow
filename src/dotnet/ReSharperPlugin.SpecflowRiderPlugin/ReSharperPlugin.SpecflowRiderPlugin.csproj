@@ -13,6 +13,7 @@
     <PackageReference Include="JetBrains.ReSharper.SDK" Version="$(SdkVersion)">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="JetBrains.ReSharperAutomationTools.src.RiderTutorials" Version="201.0.20200415.5222" />
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0-preview.2" PrivateAssets="All" />
     <!-- TODO: https://github.com/NuGet/Home/issues/7154 -->
     <PackageReference Include="Wave" Version="$(WaveVersion)" />

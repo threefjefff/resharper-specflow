@@ -1,5 +1,7 @@
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi;
+using JetBrains.Util.Logging;
 using ReSharperPlugin.SpecflowRiderPlugin.Psi;
 
 namespace ReSharperPlugin.SpecflowRiderPlugin.Daemon
@@ -9,6 +11,7 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Daemon
     {
         public override ErrorStripeRequest InitialErrorStripe(IPsiSourceFile sourceFile)
         {
+            
             if (sourceFile.Properties.ShouldBuildPsi && sourceFile.Properties.ProvidesCodeModel && sourceFile.IsLanguageSupported<GherkinLanguage>())
                 return ErrorStripeRequest.STRIPE_AND_ERRORS;
 
