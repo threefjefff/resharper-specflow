@@ -49,9 +49,10 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Navigation
             return method?.AttributesEnumerable
                 .Where(a => SpecflowAttributeLinkHelper.IsSpecflowAttribute(a, out _))
                 .Where(a => a.UserData.HasKey(key))
-                .Select(a =>
+                .SelectMany(a => a.UserData.GetData(key))
+                .Select(step =>
                 {
-                    var step = a.UserData.GetData(key);
+                    return new ContextNavigation(step!.GetText(), $"GetStepDefinition - {step!.GetText()}",
                     return new ContextNavigation(step!.GetText(), "GetStepDefinition",
                         NavigationActionGroup.Important,
                         () => { step.NavigateToTreeNode(true); });

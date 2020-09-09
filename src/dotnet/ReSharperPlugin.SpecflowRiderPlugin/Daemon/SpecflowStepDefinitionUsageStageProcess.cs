@@ -23,7 +23,7 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Daemon
     public class SpecflowStepDefinitionLinker : IDaemonStage
     {
         public static readonly Key<IAttribute> AttributeUserDataKey = new Key<IAttribute>(nameof(FeatureStepDefinitionFinder));
-        public static readonly Key<GherkinStep> StepUserDataKey = new Key<GherkinStep>(nameof(FeatureStepDefinitionFinder));
+        public static readonly Key<List<GherkinStep>> StepUserDataKey = new Key<List<GherkinStep>>(nameof(FeatureStepDefinitionFinder));
         public IEnumerable<IDaemonStageProcess> CreateProcess(
             IDaemonProcess process, 
             IContextBoundSettingsStore settings, 
@@ -101,7 +101,6 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Daemon
             }
             
             var lastSeenKeyword = GherkinStepKeyword.Unknown;
-            //For each step defition
             foreach (var step in SpecflowAttributeLinkHelper.GetGherkinSteps(_file))
             {
                 //Normalize (turn "And" into their prefered verb, replace variables with placeholder "()")
@@ -121,9 +120,7 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Daemon
                 //3. Match the first attribute with an acceptable regex string
                 if (codeDict.TryGetValue(dictKey, out var matchedAttribute))
                 {
-                    //Logger.Root.Log(LoggingLevel.TRACE, $"JSMB - Found matching attribute in: {matchedAttribute.GetSourceFile().Name}");
-                    step.UserData.PutData(SpecflowStepDefinitionLinker.AttributeUserDataKey, matchedAttribute);
-                    matchedAttribute.UserData.PutData(SpecflowStepDefinitionLinker.StepUserDataKey, step);
+                    SpecflowAttributeLinkHelper.StoreLink(matchedAttribute, step);
                 }
                 else
                 {
@@ -181,13 +178,11 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Daemon
                     }
 
                     var dictKey = $"{stepKeyword}{stepText}";
-                    //Logger.Root.Log(LoggingLevel.TRACE, $"JSMB - Found step definition: {dictKey}");
+                    Logger.Root.Log(LoggingLevel.TRACE, $"JSMB - Found step definition: {dictKey}");
                     //3. Match the first attribute with an acceptable regex string
                     if (codeDict.TryGetValue(dictKey, out var matchedAttribute))
                     {
-                        //Logger.Root.Log(LoggingLevel.TRACE, $"JSMB - Found matching attribute in: {matchedAttribute.GetSourceFile().Name}");
-                        step.UserData.PutData(SpecflowStepDefinitionLinker.AttributeUserDataKey, matchedAttribute);
-                        matchedAttribute.UserData.PutData(SpecflowStepDefinitionLinker.StepUserDataKey, step);
+                        SpecflowAttributeLinkHelper.StoreLink(matchedAttribute, step);
                     }
                     else
                     {

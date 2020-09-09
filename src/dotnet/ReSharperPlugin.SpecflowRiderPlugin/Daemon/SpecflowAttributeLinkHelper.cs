@@ -6,6 +6,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
 using JetBrains.ReSharper.Psi.CSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Util;
 using ReSharperPlugin.SpecflowRiderPlugin.Psi;
 
 namespace ReSharperPlugin.SpecflowRiderPlugin.Daemon
@@ -81,6 +82,18 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Daemon
                 return true;
             }
             return false;
+        }
+
+        public static void StoreLink(IAttribute attribute, GherkinStep step)
+        {
+            step.UserData.PutData(SpecflowStepDefinitionLinker.AttributeUserDataKey, attribute);
+            var steps = new List<GherkinStep>();
+            if (attribute.UserData.HasKey(SpecflowStepDefinitionLinker.StepUserDataKey))
+            {
+                steps = attribute.UserData.GetData(SpecflowStepDefinitionLinker.StepUserDataKey) ?? steps;
+            }
+            steps.Add(step);
+            attribute.UserData.PutData(SpecflowStepDefinitionLinker.StepUserDataKey, steps);
         }
     }
 }
