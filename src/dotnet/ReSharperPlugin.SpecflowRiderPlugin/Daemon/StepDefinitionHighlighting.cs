@@ -7,7 +7,7 @@ using ReSharperPlugin.SpecflowRiderPlugin.Psi;
 
 namespace ReSharperPlugin.SpecflowRiderPlugin.Daemon
 {
-    [StaticSeverityHighlighting(Severity.ERROR, nameof(StepDefinitionMissingHighlighting), OverlapResolve = OverlapResolveKind.NONE)]
+    [StaticSeverityHighlighting(Severity.ERROR, typeof(StepDefinitionMissingHighlighting), OverlapResolve = OverlapResolveKind.NONE)]
     public class StepDefinitionMissingHighlighting: IHighlighting
     {
         private readonly GherkinStep _step;

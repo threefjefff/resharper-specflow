@@ -6,22 +6,21 @@ using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
 using ReSharperPlugin.SpecflowRiderPlugin.Experiments;
 
-[assembly: RegisterConfigurableSeverity(
-    SampleHighlighting.SeverityId,
-    CompoundItemName: null,
-    Group: HighlightingGroupIds.CodeSmell,
-    Title: SampleHighlighting.Message,
-    Description: SampleHighlighting.Description,
-    DefaultSeverity: Severity.WARNING)]
-
 namespace ReSharperPlugin.SpecflowRiderPlugin.Experiments
 {
-    [ConfigurableSeverityHighlighting(
-        SeverityId,
-        CSharpLanguage.Name,
-        OverlapResolve = OverlapResolveKind.ERROR,
-        OverloadResolvePriority = 0,
-        ToolTipFormatString = Message)]
+    // [RegisterConfigurableSeverity(
+    //     SeverityId,
+    //     null,
+    //     HighlightingGroupIds.CodeSmell,
+    //     Message,
+    //     Description,
+    //     Severity.WARNING)]
+    // [ConfigurableSeverityHighlighting(
+    //     SeverityId,
+    //     CSharpLanguage.Name,
+    //     OverlapResolve = OverlapResolveKind.ERROR,
+    //     OverloadResolvePriority = 0,
+    //     ToolTipFormatString = Message)]
     public class SampleHighlighting : IHighlighting
     {
         public const string SeverityId = nameof(SampleHighlighting);
