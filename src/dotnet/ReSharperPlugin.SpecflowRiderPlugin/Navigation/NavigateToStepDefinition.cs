@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Application.DataContext;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Feature.Services.Navigation.ContextNavigation;
@@ -42,20 +43,19 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Navigation
         public IEnumerable<ContextNavigation> CreateWorkflow(IDataContext dataContext)
         {
             var node = dataContext.GetSelectedTreeNode<ITreeNode>();
-            var attribute = node?.GetParentOfType<IAttribute>();
+            var method = node?.GetParentOfType<IMethodDeclaration>();
+            
             var key = SpecflowStepDefinitionLinker.StepUserDataKey;
-            if (attribute != null)
-            {
-                if (attribute.UserData.HasKey(key))
+            return method?.AttributesEnumerable
+                .Where(a => SpecflowAttributeLinkHelper.IsSpecflowAttribute(a, out _))
+                .Where(a => a.UserData.HasKey(key))
+                .Select(a =>
                 {
-                    var step = attribute.UserData.GetData(key);
-                    Logger.Root.Log(LoggingLevel.TRACE, $"JSMB - Creating navigation context for: {step?.GetStepNameWithRegex()}");
-                    yield return new ContextNavigation("Step Definition", "GetStepDefinition", NavigationActionGroup.Important, () =>
-                    {
-                        step.NavigateToTreeNode(true);
-                    });
-                }
-            }
+                    var step = a.UserData.GetData(key);
+                    return new ContextNavigation(step!.GetText(), "GetStepDefinition",
+                        NavigationActionGroup.Important,
+                        () => { step.NavigateToTreeNode(true); });
+                }) ?? Enumerable.Empty<ContextNavigation>();
         }
     }
 }

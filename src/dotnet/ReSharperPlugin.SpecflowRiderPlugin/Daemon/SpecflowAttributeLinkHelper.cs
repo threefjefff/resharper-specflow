@@ -60,7 +60,7 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Daemon
             return regex.Replace("(.*)", "()");
         }
         
-        private static bool IsSpecflowAttribute(IAttribute attribute, out GherkinStepKeyword keyword)
+        public static bool IsSpecflowAttribute(IAttribute attribute, out GherkinStepKeyword keyword)
         {
             keyword = GherkinStepKeyword.Unknown;
             if (attribute?.Name.Reference.Resolve().DeclaredElement is IClass @class 
