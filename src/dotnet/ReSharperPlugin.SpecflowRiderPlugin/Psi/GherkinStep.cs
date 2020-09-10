@@ -40,17 +40,25 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Psi
             {
                 switch (te)
                 {
+                    case GherkinTable _ :
+                    case GherkinPystring _:
+                    case GherkinExamplesBlock _:
+                        break;
                     case GherkinStepParameter _:
                         sb.Append("()");
                         break;
                     case GherkinToken token:
-                        if(token.NodeType != GherkinTokenTypes.STEP_KEYWORD)
+                        if (token.NodeType == GherkinTokenTypes.TEXT ||
+                            token.NodeType == GherkinTokenTypes.WHITE_SPACE ||
+                            token.NodeType == GherkinTokenTypes.STEP_PARAMETER_BRACE)
+                        {
                             sb.Append(token.GetText());
+                        }
                         break;
                 }
             }
 
-            return sb.ToString();
+            return sb.ToString().TrimEnd();
         }
     }
 }

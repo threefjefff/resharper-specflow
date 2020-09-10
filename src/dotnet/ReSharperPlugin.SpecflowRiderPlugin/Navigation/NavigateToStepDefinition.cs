@@ -53,8 +53,7 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Navigation
                 .Select(step =>
                 {
                     return new ContextNavigation(step!.GetText(), $"GetStepDefinition - {step!.GetText()}",
-                    return new ContextNavigation(step!.GetText(), "GetStepDefinition",
-                        NavigationActionGroup.Important,
+                        NavigationActionGroup.Blessed,
                         () => { step.NavigateToTreeNode(true); });
                 }) ?? Enumerable.Empty<ContextNavigation>();
         }

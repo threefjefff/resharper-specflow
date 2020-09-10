@@ -37,7 +37,6 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Daemon
 
             if (IsCSharpFile(process.SourceFile))
             {
-                Logger.Root.Log(LoggingLevel.TRACE, $"JSMB - Found feature file: {process.SourceFile.Name}");
                 return process.SourceFile.GetPsiFiles<CSharpLanguage>().SelectNotNull((Func<IFile, IDaemonStageProcess>) 
                     (file => new CSharpStepDefinitionFinder(process, (ICSharpFile) file)));
             }
@@ -106,6 +105,7 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Daemon
                 //Normalize (turn "And" into their prefered verb, replace variables with placeholder "()")
                 var stepText = step.GetStepNameWithRegex();
                 var stepKeyword = step.GetStepKeyword();
+                
                 if (stepKeyword == GherkinStepKeyword.And)
                 {
                     stepKeyword = lastSeenKeyword;
@@ -114,7 +114,7 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Daemon
                 {
                     lastSeenKeyword = stepKeyword;
                 }
-
+                
                 var dictKey = $"{stepKeyword}{stepText}";
                 //Logger.Root.Log(LoggingLevel.TRACE, $"JSMB - Found step definition: {dictKey}");
                 //3. Match the first attribute with an acceptable regex string
@@ -178,7 +178,6 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Daemon
                     }
 
                     var dictKey = $"{stepKeyword}{stepText}";
-                    Logger.Root.Log(LoggingLevel.TRACE, $"JSMB - Found step definition: {dictKey}");
                     //3. Match the first attribute with an acceptable regex string
                     if (codeDict.TryGetValue(dictKey, out var matchedAttribute))
                     {
