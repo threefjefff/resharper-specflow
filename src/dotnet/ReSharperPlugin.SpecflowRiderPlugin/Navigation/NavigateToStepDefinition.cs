@@ -1,19 +1,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Application.DataContext;
-using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Feature.Services.Navigation.ContextNavigation;
 using JetBrains.ReSharper.Feature.Services.Navigation.NavigationExtensions;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.RiderTutorials.Utils;
 using JetBrains.Util;
-using JetBrains.Util.Logging;
 using ReSharperPlugin.SpecflowRiderPlugin.Daemon;
 using ReSharperPlugin.SpecflowRiderPlugin.Psi;
 
 namespace ReSharperPlugin.SpecflowRiderPlugin.Navigation
-{
+{ 
     [ContextNavigationProvider]
     public class NavigateToStepDefinitionAttributeProvider: IGotoImplementationsProvider
     {
@@ -27,13 +25,15 @@ namespace ReSharperPlugin.SpecflowRiderPlugin.Navigation
                 if (step.UserData.HasKey(key))
                 {
                     var attribute = step.UserData.GetData(key);
-                    Logger.Root.Log(LoggingLevel.TRACE, $"JSMB - Creating navigation context for: {attribute?.Name}");
-                    yield return new ContextNavigation("Step Definition", "GetStepDefinition", NavigationActionGroup.Important, () =>
-                    {
-                        attribute.NavigateToTreeNode(true);
-                    });
+                    return new List<ContextNavigation>{
+                        new ContextNavigation("Step Definition", 
+                        $"GetStepDefinition - {attribute?.Arguments[0].Value.GetText()}", 
+                        NavigationActionGroup.Blessed, () => { attribute.NavigateToTreeNode(true); })
+                        
+                    };
                 }
             }
+            return Enumerable.Empty<ContextNavigation>();
         }
     }
     
