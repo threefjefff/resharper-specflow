@@ -22,8 +22,13 @@ GherkinFile: Ruby8793.feature
           GherkinToken(57,76): PYSTRING_TEXT('\n    class PeopleControllerTest < ActionController::TestCase\n    end\n    ')
           GherkinToken(133,3): PYSTRING_QUOTES('"""')
       GherkinToken(136,6): WHITE_SPACE('\n    ')
-      GherkinStep: I put the caret at "caret"
+      GherkinStep: I put the caret at
         GherkinToken(142,3): STEP_KEYWORD('And')
         GherkinToken(145,1): WHITE_SPACE(' ')
-        GherkinToken(146,26): TEXT('I put the caret at "caret"')
+        GherkinToken(146,18): TEXT('I put the caret at')
+        GherkinToken(164,1): WHITE_SPACE(' ')
+        GherkinToken(165,1): STEP_PARAMETER_BRACE('"')
+        GherkinStepParameter: caret
+          GherkinToken(166,5): STEP_PARAMETER_TEXT('caret')
+        GherkinToken(171,1): STEP_PARAMETER_BRACE('"')
 
